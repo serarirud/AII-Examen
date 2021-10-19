@@ -112,7 +112,7 @@ def find_books_by_titulo_or_autor(titulo_autor: str) -> list[tuple[str, str, str
     '''Devuelve una lisat de tuplas con el título, el autor, estado de conservación
         librería y precio filtrados por título o autor'''
     
-    if ' ' in titulo_autor:
+    if ' ' in titulo_autor.strip():
         raise ValueError('Solo se permite introducir una palabra')
 
     con = sqlite3.connect(DATABASE)
