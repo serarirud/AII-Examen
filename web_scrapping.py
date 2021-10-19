@@ -15,7 +15,10 @@ getattr(ssl, '_create_unverified_context', None)):
 
 
 DATABASE="libros.db"
-
+URL_BASE = "https://www.uniliber.com"
+URL_1="https://www.uniliber.com/buscar/libros_pagina_1?descripcion%5B0%5D=CL%C3%81SICOS"
+URL_2="https://www.uniliber.com/buscar/libros_pagina_2?descripcion%5B0%5D=CL%C3%81SICOS"
+urls=[URL_1, URL_2]
 
 def abrirUrl(url):
     try:
@@ -28,14 +31,7 @@ def abrirUrl(url):
 def soup(url):
     f = abrirUrl(url)
     return BeautifulSoup(f, "html.parser")
-
-
-URL_BASE = "https://www.uniliber.com"
-URL_1="https://www.uniliber.com/buscar/libros_pagina_1?descripcion%5B0%5D=CL%C3%81SICOS"
-URL_2="https://www.uniliber.com/buscar/libros_pagina_2?descripcion%5B0%5D=CL%C3%81SICOS"
-urls=[URL_1, URL_2]
-
-
+    
 def cargar():
     connection = sqlite3.connect(DATABASE) #crea la base de datos
     connection.text_factory = str 

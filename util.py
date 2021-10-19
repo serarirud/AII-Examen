@@ -112,18 +112,6 @@ def create_entry(window: tk.Tk, label: str, command) -> None:
     entry.pack(side='left')
     return entry
 
-def create_option_button(window: tk.Tk, text: str, command, side='left') -> None:
-    option = tk.Button(window)
-    option['text'] = text
-    option['command'] = command
-    option.pack(side=side)
-
-def create_radiobutton(window: tk.Tk, option_name: str, command) -> None:
-    radiobutton = tk.Radiobutton(window)
-    radiobutton['text'] = option_name
-    radiobutton['command'] = command
-    radiobutton.pack(side='top')
-
 def create_label(window: tk.Tk, text: str, side='left') -> None:
     label = tk.Label(window)
     label['text'] = text
