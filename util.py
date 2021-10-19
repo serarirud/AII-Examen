@@ -36,6 +36,14 @@ def find_books_by_titulo_or_autor(titulo_autor: str) -> list[tuple[str, str, str
     con = sqlite3.connect(DATABASE)
     res = con.execute('SELECT titulo, autor, estado, librería, precio FROM Libros WHERE titulo LIKE ? OR autor LIKE ?'
                         , ('%{}%'.format(titulo_autor),'%{}%'.format(titulo_autor))).fetchall()
+    con.close()
+    return res
+
+def find_by_titulo_autor_aux():
+    con = sqlite3.connect(DATABASE)
+    options = [option[0] for option in con.execute('SELECT DISTINCT editorial FROM Libros').fetchall()]
+    con.close()
+    create_spinbox(options, find_books_by_titulo_or_autor)
 
 def cargar():
     pass
