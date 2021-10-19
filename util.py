@@ -1,24 +1,79 @@
 import tkinter as tk
 from tkinter import END
+from tkinter import messagebox
+import sqlite3
 
-def menu_example(*example):
+DATABASE = 'libros.db'
+
+def find_books():
+    '''Muestra una lista de tuplas cuyos datos son
+    el título, el autor, la editorial y el precio'''
+    con = sqlite3.connect(DATABASE)
+    data = con.execute('SELECT titulo, autor, editorial, precio FROM Libros').fetchall()
+    con.close()
+    crear_listbox_con_scrollbar(data)
+    
+
+def find_distinct_library():
+    '''Muestra todas las librerias y números en la base de datos'''
+    con = sqlite3.connect(DATABASE)
+    data = con.execute('SELECT DISTINCT libreria, numero FROM Libros').fetchall()
+    con.close()
+    crear_listbox_con_scrollbar(data)    
+
+def find_books_by_editorial(editorial: str) -> list[tuple[str, str, str, str, float]]:
+    '''Devuelve una lisat de tuplas con el título, el autor, estado de conservación
+    librería y precio filtrados por editorial'''
+    con = sqlite3.connect(DATABASE)
+    res = con.execute('SELECT titulo, autor, estado, librería, precio FROM Libros WHERE editorial LIKE ?'
+                        , ('%{}%'.format(editorial),)).fetchall()
+    con.close()
+    return res
+
+def find_books_by_titulo_or_autor(titulo_autor: str) -> list[tuple[str, str, str, str, float]]:
+    '''Devuelve una lisat de tuplas con el título, el autor, estado de conservación
+        librería y precio filtrados por título o autor'''
+    con = sqlite3.connect(DATABASE)
+    res = con.execute('SELECT titulo, autor, estado, librería, precio FROM Libros WHERE titulo LIKE ? OR autor LIKE ?'
+                        , ('%{}%'.format(titulo_autor),'%{}%'.format(titulo_autor))).fetchall()
+    con.close()
+    return res
+
+def find_by_titulo_autor_aux():
+    con = sqlite3.connect(DATABASE)
+    options = [option[0] for option in con.execute('SELECT DISTINCT editorial FROM Libros').fetchall()]
+    con.close()
+    create_spinbox(options, find_books_by_titulo_or_autor)
+
+def cargar():
+    pass
+
+# Tkinter functions
+
+def start():
     main_window = tk.Tk()
     
     menu = tk.Menu(main_window, tearoff=0)
 
     datos = tk.Menu(menu, tearoff=0)
-    datos.add_command(label='Cargar', command=menu_example)
-    datos.add_command(label='Listar', command=menu_example)
-    datos.add_command(label='Salir', command=lambda: menu_example(main_window))
+    datos.add_command(label='Cargar', command=cargar)
+    datos.add_command(label='Salir', command=main_window.destroy)
 
     menu.add_cascade(label='Datos', menu=datos)
 
-    busc = tk.Menu(menu, tearoff=0)
-    busc.add_command(label='Titulo', command=lambda: menu_example('Título: ', menu_example.search_by_title))
-    busc.add_command(label='Fecha', command=lambda: menu_example('Fecha: ', menu_example.search_by_date))
-    busc.add_command(label='Genero', command=menu_example)
+    listar = tk.Menu(menu, tearoff=0)
+    listar.add_command(label='Libros', command=find_books)
+    listar.add_command(label='Librerías', command=find_distinct_library)
 
-    menu.add_cascade(label='Buscar', menu=busc)
+    menu.add_cascade(label='Listar', menu=listar)
+
+    buscar = tk.Menu(menu, tearoff=0)
+    buscar.add_command(label='Libros por editorial'
+                        , command=lambda: create_search_window_one_entry('Editorial: ', find_books_by_editorial))
+    buscar.add_command(label='Libros por título o autor'
+                        , command=find_by_titulo_autor_aux)
+
+    menu.add_cascade(label='Buscar', menu=buscar)
     
     main_window.config(menu=menu)
     main_window.mainloop()
@@ -42,28 +97,10 @@ def create_search_window_one_entry(label, command) -> None:
             window.destroy()
             crear_listbox_con_scrollbar(data)
         except:
-            create_search_window(label, command)
+            create_search_window_one_entry(label, command)
     window = tk.Tk()
 
     entry = create_entry(window, label, listar)
-    window.mainloop()
-
-def create_search_window(labels, command) -> None:
-    def listar(event):
-        kwargs = {'entry{}'.format(i+1): entry.get() for i, entry in enumerate(entries)}
-        try:
-            window.destroy()
-            data = command(**kwargs)
-            crear_listbox_con_scrollbar(data)
-        except:
-            create_search_window(labels, command)
-    window = tk.Tk()
-    if not isinstance(labels, list):
-        labels = [labels]
-
-    entries = []
-    for label in labels:
-        entries.append(create_entry(window, label, listar))
     window.mainloop()
 
 def create_entry(window: tk.Tk, label: str, command) -> None:
@@ -103,3 +140,5 @@ def create_spinbox(options: list[str], command):
     spinbox = tk.Spinbox(window, width=200, values=options)
     spinbox.pack(side='top')
     spinbox.bind('<Return>', listar)
+
+start()
