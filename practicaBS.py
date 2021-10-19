@@ -118,7 +118,7 @@ def find_books_by_titulo_or_autor(titulo_autor: str) -> list[tuple[str, str, str
     con = sqlite3.connect(DATABASE)
     res = [(titulo, autor, estado, libreria, '{}€'.format(precio)) for titulo, autor, estado, libreria, precio in 
                         con.execute('SELECT titulo, autor, estado, libreria, precio FROM Libros WHERE titulo LIKE ? OR autor LIKE ?'
-                        , ('%{}%'.format(titulo_autor),'%{}%'.format(titulo_autor))).fetchall()]
+                        , ('%{}%'.format(titulo_autor.strip()),'%{}%'.format(titulo_autor.strip()))).fetchall()]
     con.close()
     return res
 
