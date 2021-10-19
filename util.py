@@ -71,7 +71,7 @@ def start():
     buscar.add_command(label='Libros por editorial'
                         , command=lambda: create_search_window_one_entry('Editorial: ', find_books_by_editorial))
     buscar.add_command(label='Libros por título o autor'
-                        , command=lambda: create_search_window_one_entry('Título o autor: ', find_books_by_titulo_or_autor))
+                        , command=find_by_titulo_autor_aux)
 
     menu.add_cascade(label='Buscar', menu=buscar)
     
