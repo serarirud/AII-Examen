@@ -16,6 +16,8 @@ URL_1="https://www.uniliber.com/buscar/libros_pagina_1?descripcion%5B0%5D=CL%C3%
 URL_2="https://www.uniliber.com/buscar/libros_pagina_2?descripcion%5B0%5D=CL%C3%81SICOS"
 urls=[URL_1, URL_2]
 
+# Ejercicio 1
+
 def abrirUrl(url):
     try:
         f = urllib.request.urlopen(url)
@@ -79,15 +81,13 @@ def cargar():
     connection.close()
     messagebox.showinfo('Guardado correctamente.', 'Se han guardado correctamente {} libros'.format(num))
 
-# Ejercicio 1
-
 # Ejercicio 2 y 3
 
 def find_books():
     '''Muestra una lista de tuplas cuyos datos son
     el título, el autor, la editorial y el precio'''
     con = sqlite3.connect(DATABASE)
-    data = con.execute('SELECT titulo, autor, editorial, precio FROM Libros').fetchall()
+    data = [(titulo, autor, editorial, '{}€'.format(precio)) for titulo, autor, editorial, precio in con.execute('SELECT titulo, autor, editorial, precio FROM Libros').fetchall()]
     con.close()
     crear_listbox_con_scrollbar(data)
 
@@ -102,8 +102,9 @@ def find_books_by_editorial(editorial: str) -> list[tuple[str, str, str, str, fl
     '''Devuelve una lisat de tuplas con el título, el autor, estado de conservación
     librería y precio filtrados por editorial'''
     con = sqlite3.connect(DATABASE)
-    res = con.execute('SELECT titulo, autor, estado, libreria, precio FROM Libros WHERE editorial LIKE ?'
-                        , ('%{}%'.format(editorial),)).fetchall()
+    res = [(titulo, autor, estado, libreria, '{}€'.format(precio)) for titulo, autor, estado, libreria, precio in 
+                        con.execute('SELECT titulo, autor, estado, libreria, precio FROM Libros WHERE editorial LIKE ?'
+                        , ('%{}%'.format(editorial),)).fetchall()]
     con.close()
     return res
 
@@ -115,8 +116,9 @@ def find_books_by_titulo_or_autor(titulo_autor: str) -> list[tuple[str, str, str
         raise ValueError('Solo se permite introducir una palabra')
 
     con = sqlite3.connect(DATABASE)
-    res = con.execute('SELECT titulo, autor, estado, libreria, precio FROM Libros WHERE titulo LIKE ? OR autor LIKE ?'
-                        , ('%{}%'.format(titulo_autor),'%{}%'.format(titulo_autor))).fetchall()
+    res = [(titulo, autor, estado, libreria, '{}€'.format(precio)) for titulo, autor, estado, libreria, precio in 
+                        con.execute('SELECT titulo, autor, estado, libreria, precio FROM Libros WHERE titulo LIKE ? OR autor LIKE ?'
+                        , ('%{}%'.format(titulo_autor),'%{}%'.format(titulo_autor))).fetchall()]
     con.close()
     return res
 
